@@ -1,11 +1,8 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
-import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
-import com.intellij.jira.actions.JiraIssueTransitionDialogAction;
+import com.intellij.jira.actions.*;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.rest.model.JiraProjectVersion;
+import com.intellij.jira.rest.model.JiraProjectVersionDetails;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
@@ -132,7 +129,7 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         // Versions
         JBPanel versionsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
         JBLabel versionsLabel = JiraLabelUtil.createLabel("Versions: ").withFont(BOLD);
-        JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getVersions()));
+        JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getFixVersions()));
 
         versionsPanel.add(versionsLabel, LINE_START);
         versionsPanel.add(versionsValueLabel, CENTER);
@@ -167,17 +164,19 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         group.add(new JiraIssueTransitionDialogAction(() -> issue));
         group.add(new JiraIssueAssigneePopupAction(() -> issue));
         group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
+        group.add(new JiraIssueVersionPopupAction(() -> issue));
+        group.add(new JiraSubIssueCreateDialogAction(() -> issue));
 
         return group;
     }
 
-    private String getVersionsNames(List<JiraProjectVersion> versions){
+    private String getVersionsNames(List<JiraProjectVersionDetails> versions) {
         if(versions.isEmpty()){
             return "None";
         }
 
         return versions.stream()
-                .map(JiraProjectVersion::getName)
+                .map(JiraProjectVersionDetails::getName)
                 .collect(Collectors.joining(", "));
     }
 

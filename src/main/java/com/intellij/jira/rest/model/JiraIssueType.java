@@ -11,6 +11,18 @@ public class JiraIssueType {
 
     public JiraIssueType() { }
 
+    public JiraIssueType(String id, String self, String name, String description, String iconUrl, boolean subtask) {
+        this.id = id;
+        this.self = self;
+        this.name = name;
+        this.description = description;
+        this.iconUrl = iconUrl;
+        this.subtask = subtask;
+    }
+
+    public JiraIssueType(JiraIssueType other) {
+        this(other.getId(), other.getSelf(), other.getName(), other.getDescription(), other.getIconUrl(), other.isSubtask());
+    }
 
     public String getId() {
         return id;
@@ -36,4 +48,13 @@ public class JiraIssueType {
         return subtask;
     }
 
+    @Override
+    public JiraIssueType clone() {
+        return new JiraIssueType(this);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

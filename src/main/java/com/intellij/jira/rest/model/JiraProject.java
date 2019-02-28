@@ -1,11 +1,14 @@
 package com.intellij.jira.rest.model;
 
+import java.util.List;
+
 public class JiraProject {
 
     private String id;
     private String name;
     private String self;
     private String key;
+    private List<JiraIssueType> issueTypes;
 
     public JiraProject() { }
 
@@ -27,6 +30,10 @@ public class JiraProject {
 
     public String getUrl(){
         return self.replaceFirst("(/rest([\\w/]+))", "/projects/" + getKey() + "/summary");
+    }
+
+    public List<JiraIssueType> getIssueTypes() {
+        return issueTypes;
     }
 
     @Override

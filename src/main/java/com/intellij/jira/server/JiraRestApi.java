@@ -26,6 +26,14 @@ public class JiraRestApi {
     }
 
 
+    public JiraIssueUser getMyInfo() {
+        try {
+            return this.jiraRestClient.getMyInfo();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public Result getIssue(String issueIdOrKey){
         try {
             JiraIssue issue = this.jiraRestClient.getIssue(issueIdOrKey);
@@ -176,5 +184,51 @@ public class JiraRestApi {
 
     public boolean testConnection() throws Exception {
         return jiraRestClient.testConnection();
+    }
+
+    public Result getProject(String projectKey) {
+        try {
+            return BodyResult.ok(jiraRestClient.getProject(projectKey));
+        } catch (Exception e) {
+            return BodyResult.error();
+        }
+    }
+
+    public List<JiraProjectVersionDetails> getProjectVersionDetails(String projectKey) {
+        try {
+            return jiraRestClient.getProjectVersionDetails(projectKey);
+        } catch (Exception e) {
+            return ContainerUtil.emptyList();
+        }
+    }
+
+    public Result changeIssueFixVersion(String version, String issueIdOrKey) {
+        try {
+            String response = jiraRestClient.changeIssueFixVersion(version, issueIdOrKey);
+            return EmptyResult.create(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return EmptyResult.error();
+        }
+    }
+
+    public Result createIssue(JiraIssueForCreate issue) {
+        try {
+            JiraIssue createdIssue = jiraRestClient.createIssue(issue);
+            return BodyResult.ok(createdIssue);
+        } catch (Exception e) {
+            log.error("Error creating issue");
+            return BodyResult.error();
+        }
+    }
+
+    public Result linkIssue(String issueIdOrKey, String parentIssueIdOrKey) {
+        try {
+            String response = jiraRestClient.linkIssue(issueIdOrKey, parentIssueIdOrKey);
+            return EmptyResult.create(response);
+        } catch (Exception e) {
+            log.error("Error creating issue");
+            return EmptyResult.error();
+        }
     }
 }

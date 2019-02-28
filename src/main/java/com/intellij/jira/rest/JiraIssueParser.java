@@ -3,6 +3,7 @@ package com.intellij.jira.rest;
 import com.google.gson.reflect.TypeToken;
 import com.intellij.jira.rest.model.*;
 import com.intellij.tasks.jira.JiraRepository;
+import com.intellij.tasks.jira.rest.model.JiraUser;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.lang.reflect.Type;
@@ -15,6 +16,10 @@ public class JiraIssueParser {
 
     private JiraIssueParser() { }
 
+
+    public static JiraUser parseMyInfo(String response) {
+        return JiraRepository.GSON.fromJson(response, JiraUser.class);
+    }
 
     public static JiraIssue parseIssue(String response){
         return JiraRepository.GSON.fromJson(response, JiraIssue.class);
@@ -69,6 +74,14 @@ public class JiraIssueParser {
         }
 
         return wrapper.getGroups();
+    }
+
+    public static JiraProject parseProject(String response) {
+        return JiraRepository.GSON.fromJson(response, JiraProject.class);
+    }
+
+    public static List<JiraProjectVersionDetails> parseProjectVersionsDetails(String response) {
+        return Arrays.asList(JiraRepository.GSON.fromJson(response, JiraProjectVersionDetails[].class));
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,fixVersions";
 
     private String id;
     private String self;
@@ -94,6 +94,11 @@ public class JiraIssue {
         return fields.versions;
     }
 
+
+    public List<JiraProjectVersionDetails> getFixVersions() {
+        return fields.fixVersions;
+    }
+
     public String getUrl(){
         return self.replaceFirst("(/rest([\\w/]+))", "/browse/" + getKey());
     }
@@ -120,10 +125,153 @@ public class JiraIssue {
         private List<JiraIssueLink> issuelinks = ContainerUtil.emptyList();
         private JiraProject project;
         private List<JiraProjectVersion> versions = ContainerUtil.emptyList();
+        private List<JiraProjectVersionDetails> fixVersions = ContainerUtil.emptyList();
 
         public Fields() { }
 
+        public String getSummary() {
+            return summary;
+        }
 
+        public void setSummary(String summary) {
+            this.summary = summary;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public Date getCreated() {
+            return created;
+        }
+
+        public void setCreated(Date created) {
+            this.created = created;
+        }
+
+        public Date getUpdated() {
+            return updated;
+        }
+
+        public void setUpdated(Date updated) {
+            this.updated = updated;
+        }
+
+        public Date getResolutiondate() {
+            return resolutiondate;
+        }
+
+        public void setResolutiondate(Date resolutiondate) {
+            this.resolutiondate = resolutiondate;
+        }
+
+        public Date getDuedate() {
+            return duedate;
+        }
+
+        public void setDuedate(Date duedate) {
+            this.duedate = duedate;
+        }
+
+        public JiraIssueType getIssuetype() {
+            return issuetype;
+        }
+
+        public void setIssuetype(JiraIssueType issuetype) {
+            this.issuetype = issuetype;
+        }
+
+        public JiraIssueStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(JiraIssueStatus status) {
+            this.status = status;
+        }
+
+        public JiraIssuePriority getPriority() {
+            return priority;
+        }
+
+        public void setPriority(JiraIssuePriority priority) {
+            this.priority = priority;
+        }
+
+        public JiraIssueUser getAssignee() {
+            return assignee;
+        }
+
+        public void setAssignee(JiraIssueUser assignee) {
+            this.assignee = assignee;
+        }
+
+        public JiraIssueUser getCreator() {
+            return creator;
+        }
+
+        public void setCreator(JiraIssueUser creator) {
+            this.creator = creator;
+        }
+
+        public JiraIssueUser getReporter() {
+            return reporter;
+        }
+
+        public void setReporter(JiraIssueUser reporter) {
+            this.reporter = reporter;
+        }
+
+        public JiraIssueCommentsWrapper getComment() {
+            return comment;
+        }
+
+        public void setComment(JiraIssueCommentsWrapper comment) {
+            this.comment = comment;
+        }
+
+        public List<JiraIssueLink> getIssuelinks() {
+            return issuelinks;
+        }
+
+        public void setIssuelinks(List<JiraIssueLink> issuelinks) {
+            this.issuelinks = issuelinks;
+        }
+
+        public JiraProject getProject() {
+            return project;
+        }
+
+        public void setProject(JiraProject project) {
+            this.project = project;
+        }
+
+        public List<JiraProjectVersion> getVersions() {
+            return versions;
+        }
+
+        public void setVersions(List<JiraProjectVersion> versions) {
+            this.versions = versions;
+        }
+
+        public List<JiraProjectVersionDetails> getFixVersions() {
+            return fixVersions;
+        }
+
+        public void setFixVersions(List<JiraProjectVersionDetails> fixVersions) {
+            this.fixVersions = fixVersions;
+        }
+    }
+
+    public Fields getFields() {
+        return fields;
+    }
+
+    public void setFields(Fields fields) {
+        this.fields = fields;
     }
 
     @Override

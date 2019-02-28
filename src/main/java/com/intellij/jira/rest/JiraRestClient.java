@@ -21,7 +21,9 @@ public class JiraRestClient {
     private static final Integer MAX_ISSUES_RESULTS = 500;
     private static final Integer MAX_USERS_RESULTS = 200;
 
+    private static final String MYSELF = "myself";
     private static final String ISSUE = "issue";
+    private static final String ISSUE_LINK = "issueLink";
     private static final String TRANSITIONS = "transitions";
     private static final String SEARCH = "search";
 
@@ -31,6 +33,11 @@ public class JiraRestClient {
         this.jiraRepository = jiraRepository;
     }
 
+    public JiraIssueUser getMyInfo() throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(MYSELF));
+        String response = jiraRepository.executeMethod(method);
+        return parseUser(response);
+    }
     public JiraIssue getIssue(String issueIdOrKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
         method.setQueryString(method.getQueryString() + "?fields=" + JiraIssue.REQUIRED_FIELDS);
@@ -209,6 +216,40 @@ public class JiraRestClient {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("myself"));
         jiraRepository.executeMethod(method);
         return method.getStatusCode() == 200;
+    }
+
+    public JiraProject getProject(String projectKey) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("project", projectKey));
+        String response = jiraRepository.executeMethod(method);
+        return parseProject(response);
+    }
+
+    public List<JiraProjectVersionDetails> getProjectVersionDetails(String projectKey) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("project", projectKey, "versions"));
+        String response = jiraRepository.executeMethod(method);
+        return parseProjectVersionsDetails(response);
+    }
+
+    public String changeIssueFixVersion(String version, String issueIdOrKey) throws Exception {
+        String requestBody = "{\"update\": {\"fixVersions\": [{\"set\": [{\"name\": \"" + version + "\"}]}]}}";
+        PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
+        method.setRequestEntity(createJsonEntity(requestBody));
+        return jiraRepository.executeMethod(method);
+    }
+
+    public JiraIssue createIssue(JiraIssueForCreate issue) throws Exception {
+        String requestBody = "{\"fields\":{\"project\":{\"id\":\"" + issue.getProjectId() + "\"},\"summary\":\"" + issue.getSummary() + "\",\"issuetype\":{\"id\":\"" + issue.getIssueTypeId() + "\"},\"assignee\":{\"name\":\"" + issue.getAssignee() + "\"},\"reporter\":{\"name\":\"" + issue.getReporter() + "\"},\"description\":\"" + issue.getDescription() + "\"}}";
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE));
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+        return parseIssue(response);
+    }
+
+    public String linkIssue(String issueIdOrKey, String parentIssueIdOrKey) throws Exception {
+        String requestBody = "{\"type\":{\"name\":\"관련이슈\"},\"inwardIssue\":{\"key\":\"" + parentIssueIdOrKey + "\"},\"outwardIssue\":{\"key\":\"" + issueIdOrKey + "\"}}}";
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE_LINK));
+        method.setRequestEntity(createJsonEntity(requestBody));
+        return jiraRepository.executeMethod(method);
     }
 }
 
