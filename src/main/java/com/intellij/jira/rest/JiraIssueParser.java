@@ -83,6 +83,10 @@ public class JiraIssueParser {
         return JiraRepository.GSON.fromJson(response, JiraProject.class);
     }
 
+    public static JiraProjectVersionDetails parseProjectVersionsDetail(String response) {
+        return JiraRepository.GSON.fromJson(response, JiraProjectVersionDetails.class);
+    }
+
     public static List<JiraProjectVersionDetails> parseProjectVersionsDetails(String response) {
         return Arrays.asList(JiraRepository.GSON.fromJson(response, JiraProjectVersionDetails[].class));
     }

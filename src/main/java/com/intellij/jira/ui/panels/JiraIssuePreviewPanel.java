@@ -165,7 +165,7 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         group.add(new JiraIssueAssigneePopupAction(() -> issue));
         group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
         group.add(new JiraIssueVersionPopupAction(() -> issue));
-        group.add(new JiraSubIssueCreateDialogAction(() -> issue));
+        group.add(new AddJiraSubIssueDialogAction(() -> issue));
 
         return group;
     }

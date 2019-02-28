@@ -41,8 +41,6 @@ public class JiraIssueVersionPopupAction extends JiraIssueAction {
         JiraIssue issue = this.issueFactory.create();
         List<JiraProjectVersionDetails> versions = jiraRestApi.getProjectVersionDetails(issue.getProject().getKey());
 
-        System.out.println(issue.getProject().getKey());
-        System.out.println(versions);
         JiraIssueVersionPopup popup = new JiraIssueVersionPopup(createActionGroup(versions, issue), project);
         popup.showInCenterOf(getComponent());
 

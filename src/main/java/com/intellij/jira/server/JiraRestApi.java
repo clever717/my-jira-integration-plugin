@@ -202,6 +202,16 @@ public class JiraRestApi {
         }
     }
 
+    public Result addVersionToProject(String projectName, String projectId, String name, String description) {
+        try {
+            JiraProjectVersionDetails version = jiraRestClient.addVersionToProject(projectName, projectId, name, description);
+            return BodyResult.ok(version);
+        } catch (Exception e) {
+            log.error(String.format("Error creating version in project '%s'", projectName));
+            return BodyResult.error();
+        }
+    }
+
     public List<JiraProjectVersionDetails> getProjectVersionDetails(String projectKey) {
         try {
             return jiraRestClient.getProjectVersionDetails(projectKey);

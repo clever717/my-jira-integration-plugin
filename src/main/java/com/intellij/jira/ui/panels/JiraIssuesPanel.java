@@ -112,7 +112,8 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         group.add(JiraActionManager.getInstance().getJiraIssuesRefreshAction());
         group.add(new JQLSearcherActionGroup());
         group.add(new GoToIssuePopupAction());
-        group.add(new JiraIssueCreateDialogAction());
+        group.add(new AddJiraIssueDialogAction());
+        group.add(new AddJiraVersionDialogAction());
         group.add(Separator.getInstance());
         group.add(new ConfigureJiraServersAction());
         return group;

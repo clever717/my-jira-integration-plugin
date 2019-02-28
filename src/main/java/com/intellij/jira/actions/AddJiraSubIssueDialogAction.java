@@ -19,13 +19,13 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class JiraSubIssueCreateDialogAction extends JiraIssueAction {
+public class AddJiraSubIssueDialogAction extends JiraIssueAction {
     private static final ActionProperties properties = ActionProperties.of("SubIssue", AllIcons.General.CopyHovered);
 
     private JiraIssueFactory issueFactory;
 
 
-    public JiraSubIssueCreateDialogAction(JiraIssueFactory factory) {
+    public AddJiraSubIssueDialogAction(JiraIssueFactory factory) {
         super(properties);
         this.issueFactory = factory;
     }

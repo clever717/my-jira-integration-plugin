@@ -239,6 +239,14 @@ public class JiraRestClient {
         return parseProject(response);
     }
 
+    public JiraProjectVersionDetails addVersionToProject(String projectName, String projectId, String name, String description) throws Exception {
+        String requestBody = "{\"description\":\"" + description + "\",\"name\":\"" + name + "\",\"archived\":false,\"released\":false,\"project\":\"" + projectName + "\",\"projectId\":" + projectId + "}";
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl("version"));
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+        return parseProjectVersionsDetail(response);
+    }
+
     public List<JiraProjectVersionDetails> getProjectVersionDetails(String projectKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("project", projectKey, "versions"));
         String response = jiraRepository.executeMethod(method);

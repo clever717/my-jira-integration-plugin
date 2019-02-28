@@ -17,10 +17,10 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 
-public class JiraIssueCreateDialogAction extends JiraIssueAction {
+public class AddJiraIssueDialogAction extends JiraIssueAction {
     private static final ActionProperties properties = ActionProperties.of("Issue", AllIcons.General.Add);
 
-    public JiraIssueCreateDialogAction() {
+    public AddJiraIssueDialogAction() {
         super(properties);
     }
 
