@@ -1,17 +1,18 @@
 <idea-plugin>
     <id>com.intellij.jira</id>
-    <name>Jira Integration</name>
-    <vendor email="adrielsr3@gmail.com" url="https://gitlab.com/adrielsr/jira-intellij-plugin">Adriel Saa Romano</vendor>
+    <name>My Jira Integration by hans</name>
+    <vendor email="clever717@gmail.com" url="https://github.com/clever717/my-jira-integration-plugin">Hans Lee</vendor>
 
     <description>
         <![CDATA[
-
-            This plugin provides the followings functionalities:
+            This plugin is based on <a href="https://gitlab.com/adrielsr/jira-intellij-plugin">jira-integration-plugin</a>
             <ul>
                 <li>Fetch issues from server with customizable searchers</li>
                 <li>View issue details</li>
                 <li>Run actions on issue, like transit an issue, assign it, change his priority,...</li>
                 <li>Go to specific issue on list</li>
+                <li>New : Create Sub Issue for developer</li>
+                <li>New : updatable fixVersion</li>
             </ul>
 
         ]]>

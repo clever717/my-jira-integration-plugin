@@ -2,6 +2,7 @@ package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueForCreate;
 import com.intellij.jira.rest.model.JiraIssueUser;
 import com.intellij.jira.rest.model.JiraProject;
 import com.intellij.jira.server.JiraRestApi;
@@ -11,6 +12,8 @@ import com.intellij.jira.util.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -36,24 +39,42 @@ public class JiraSubIssueCreateDialogAction extends JiraIssueAction {
             if (isNull(jiraRestApi)) {
                 return;
             }
-            JiraIssueUser myInfo = jiraRestApi.getMyInfo();
-            JiraIssue issue = issueFactory.create();
-            List<JiraIssueUser> assignableUsers = jiraRestApi.getAssignableUsers(issue.getKey());
-            JiraProject jiraProject = (JiraProject) jiraRestApi.getProject(issue.getProject().getKey()).get();
-            JiraIssue.Fields fields = new JiraIssue.Fields();
-            //요약
-            fields.setSummary(issue.getSummary());
-            //보고자
-            fields.setReporter(myInfo);
-            //담당자
-            fields.setAssignee(myInfo);
-            //내용
-            fields.setDescription(issue.getDescription());
-            //프로젝트
-            fields.setProject(jiraProject);
+            getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            SwingUtilities.invokeLater(() -> {
+                JiraIssue issue = issueFactory.create();
+                JiraIssueUser myInfo = jiraRestApi.getMyInfo();
+                List<JiraProject> projectList = jiraRestApi.getProjects();
+                List<JiraIssueUser> assignableUsers = jiraRestApi.getAssignableUsers("issue", issue.getKey());
 
-            IssueCreateDialog dialog = new IssueCreateDialog(project, fields, assignableUsers, issue.getKey());
-            dialog.show();
+                JiraIssueForCreate createModel = new JiraIssueForCreate();
+
+                //내 정보
+                createModel.setMyInfo(myInfo);
+                //모든 사용자
+                createModel.setAssignableUserList(assignableUsers);
+                //모든 프로젝트
+                createModel.setProjectList(projectList);
+
+                /*부모 이슈 내용 세팅*/
+
+                //부모 키
+                createModel.setParentIssueIdOrKey(issue.getKey());
+                //프로젝트
+                createModel.setProjectId(issue.getProject().getId());
+                //요약
+                createModel.setSummary(issue.getSummary());
+                //보고자
+                createModel.setReporter(myInfo.getName());
+                //담당자
+                createModel.setAssignee(myInfo.getName());
+                //내용
+                createModel.setDescription(issue.getDescription());
+
+
+                IssueCreateDialog dialog = new IssueCreateDialog(project, createModel);
+                dialog.show();
+                getComponent().setCursor(Cursor.getDefaultCursor());
+            });
 
         }
 

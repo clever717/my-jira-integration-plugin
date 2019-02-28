@@ -85,9 +85,9 @@ public class JiraRestApi {
         }
     }
 
-    public List<JiraIssueUser> getAssignableUsers(String issueKey){
+    public List<JiraIssueUser> getAssignableUsers(String type, String issueKey) {
         try {
-            return jiraRestClient.getAssignableUsers(issueKey);
+            return jiraRestClient.getAssignableUsers(type, issueKey);
         } catch (Exception e) {
             log.error("Error fetching users to assign");
             return ContainerUtil.emptyList();
@@ -184,6 +184,14 @@ public class JiraRestApi {
 
     public boolean testConnection() throws Exception {
         return jiraRestClient.testConnection();
+    }
+
+    public List<JiraProject> getProjects() {
+        try {
+            return this.jiraRestClient.findProjects();
+        } catch (Exception e) {
+            return ContainerUtil.emptyList();
+        }
     }
 
     public Result getProject(String projectKey) {

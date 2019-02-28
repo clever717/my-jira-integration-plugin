@@ -1,7 +1,10 @@
 package com.intellij.jira.util;
 
+import com.intellij.openapi.util.IconLoader;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.swing.*;
 
 public class SimpleSelectableListTest {
 
@@ -85,6 +88,24 @@ public class SimpleSelectableListTest {
 
         myList.clear();
         Assert.assertEquals(myList.getSelectedItemIndex(), -1);
+    }
+
+
+    @Test
+    public void icon_test() {
+        JPanel frame = new JPanel();
+
+        Icon loadingIcon = IconLoader.getIcon("/icons/loading.gif");
+        frame.add(new JLabel("loading... ", loadingIcon, JLabel.CENTER));
+
+        frame.setSize(400, 300);
+        frame.setVisible(true);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

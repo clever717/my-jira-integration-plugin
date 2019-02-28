@@ -1,10 +1,11 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
-import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueForCreate;
 import com.intellij.jira.rest.model.JiraIssueType;
 import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.jira.rest.model.JiraProject;
+import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.tasks.CreateIssueTask;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.openapi.project.Project;
@@ -24,9 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,40 +36,30 @@ import static java.util.Objects.nonNull;
 import static javax.swing.BoxLayout.Y_AXIS;
 
 public class IssueCreateDialog extends DialogWrapper {
-
     private final static int DEFAULT_FIELD_WIDTH = 200;
     private final static int DEFAULT_FIELD_HEIGHT = 24;
 
     private Project project;
-    private JiraIssue.Fields fields;
-    private String parentIssueIdOrKey;
-    private List<JiraIssueUser> assignableUsers;
-
     private JPanel issuePanel;
-
     private JiraIssueForCreate createIssue;
-
-    private Map<String, FieldEditorInfo> issueFields = new HashMap<>();
 
     //FORM
     private JBTextField summaryTextField; //요약
-    private JBTextField reporterTextField; //보고자
-    private JBTextField assigneeTextField; //담당자
     private JBTextArea descriptionTextArea; //내용
 
-    private ComboBox<JiraIssueType> issueTypeComboBox;
+    private CollectionComboBoxModel<JiraProject> projectItems;
     private CollectionComboBoxModel<JiraIssueType> issueTypeItems;
-
-    private ComboBox<JiraIssueUser> reporterComboBox;
-    private ComboBox<JiraIssueUser> assigneeComboBox;
     private CollectionComboBoxModel<JiraIssueUser> assignableUsersItems;
 
-    public IssueCreateDialog(@Nullable Project project, @NotNull JiraIssue.Fields fields, @NotNull List<JiraIssueUser> assignableUsers, @NotNull String parentIssueIdOrKey) {
+    private ComboBox<JiraProject> projectComboBox;
+    private ComboBox<JiraIssueType> issueTypeComboBox;
+    private ComboBox<JiraIssueUser> reporterComboBox;
+    private ComboBox<JiraIssueUser> assigneeComboBox;
+
+    public IssueCreateDialog(@Nullable Project project, @NotNull JiraIssueForCreate createModel) {
         super(project, false);
         this.project = project;
-        this.fields = fields;
-        this.assignableUsers = assignableUsers;
-        this.parentIssueIdOrKey = parentIssueIdOrKey;
+        this.createIssue = createModel;
 
         myOKAction = new CreateIssueExecuteAction().disabled();
         init();
@@ -78,7 +67,7 @@ public class IssueCreateDialog extends DialogWrapper {
 
     @Override
     protected void init() {
-        setTitle("Create Sub Issue for Developers");
+        setTitle("Create Issue for Developers");
         super.init();
     }
 
@@ -89,18 +78,33 @@ public class IssueCreateDialog extends DialogWrapper {
         issuePanel = new JBPanel(new BorderLayout());
         issuePanel.setLayout(new BoxLayout(issuePanel, Y_AXIS));
 
+        // Project
+        JBLabel projectLabel = JiraLabelUtil.createLabel("프로젝트: ").withFont(BOLD);
+        projectItems = new CollectionComboBoxModel(new ArrayList());
+        for (JiraProject project : createIssue.getProjectList()) {
+            JiraProject clone = project.clone();
+            projectItems.add(clone);
+        }
+        projectComboBox = new ComboBox<>(projectItems, DEFAULT_FIELD_WIDTH);
+        projectComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
+        if (createIssue.getProjectId() != null) {
+            projectComboBox.setSelectedItem(new JiraProject(createIssue.getProjectId()));
+        } else {
+            projectComboBox.setSelectedIndex(0);
+        }
+
         // Summary
         Pattern summaryPattern = Pattern.compile("^(\\[([^]]+)\\])");
-        Matcher matcher = summaryPattern.matcher(fields.getSummary());
+        Matcher matcher = summaryPattern.matcher(createIssue.getSummary());
         String subSummary = "";
         String replaceStrDepartment = "[개발]";
-        if (fields.getReporter().getName().indexOf("steve") > 0) {
+        if (createIssue.getMyInfo().getName().indexOf("steve") > 0) {
             replaceStrDepartment = "[퍼블리싱]";
         }
         if (matcher.find()) {
             subSummary = matcher.replaceFirst(replaceStrDepartment);
         } else {
-            subSummary = replaceStrDepartment + fields.getSummary();
+            subSummary = replaceStrDepartment + createIssue.getSummary();
         }
         JBLabel summaryLabel = JiraLabelUtil.createLabel("요약: ").withFont(BOLD);
         summaryTextField = new JBTextField(subSummary);
@@ -108,41 +112,23 @@ public class IssueCreateDialog extends DialogWrapper {
 
         // Type
         JBLabel typeLabel = JiraLabelUtil.createLabel("이슈 유형: ").withFont(BOLD);
-
-        issueTypeItems = new CollectionComboBoxModel(new ArrayList());
-        for (JiraIssueType issueType : fields.getProject().getIssueTypes()) {
-            JiraIssueType clone = issueType.clone();
-            issueTypeItems.add(clone);
-        }
-        issueTypeComboBox = new ComboBox<>(issueTypeItems);
-        issueTypeComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
-        issueTypeComboBox.setSelectedIndex(0);
+        createIssueTypeComboBox();
 
         // Reporter
         JBLabel reporterLabel = JiraLabelUtil.createLabel("보고자: ").withFont(BOLD);
-
-        assignableUsersItems = new CollectionComboBoxModel(new ArrayList());
-        for (JiraIssueUser jiraIssueUser : assignableUsers) {
-            JiraIssueUser clone = jiraIssueUser.clone();
-            assignableUsersItems.add(clone);
-        }
-        reporterComboBox = new ComboBox<>(assignableUsersItems);
-        reporterComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
-        reporterComboBox.setSelectedItem(fields.getReporter());
-
         // Assignee
         JBLabel assigneeLabel = JiraLabelUtil.createLabel("담당자: ").withFont(BOLD);
-        assigneeComboBox = new ComboBox<>(assignableUsersItems);
-        assigneeComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
-        assigneeComboBox.setSelectedItem(fields.getAssignee());
+
+        createAssignableUserComboBox();
 
 
         // Description
-        descriptionTextArea = new JBTextArea(fields.getDescription(), 5, 60);
+        descriptionTextArea = new JBTextArea(createIssue.getDescription(), 5, 60);
         descriptionTextArea.setLineWrap(true);
         descriptionTextArea.setWrapStyleWord(true);
 
         issuePanel = FormBuilder.createFormBuilder()
+                .addLabeledComponent(projectLabel, projectComboBox)
                 .addLabeledComponent(summaryLabel, summaryTextField)
                 .addLabeledComponent(typeLabel, issueTypeComboBox)
                 .addLabeledComponent(reporterLabel, reporterComboBox)
@@ -150,9 +136,91 @@ public class IssueCreateDialog extends DialogWrapper {
                 .addComponent(descriptionTextArea)
                 .getPanel();
 
+        projectComboBoxChangeAction();
+
         return issuePanel;
     }
 
+
+    private void projectComboBoxChangeAction() {
+        this.projectComboBox.addActionListener(e -> {
+            getContentPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            SwingUtilities.invokeLater(() -> {
+                JiraProject selectedItem = (JiraProject) this.projectComboBox.getSelectedItem();
+                if (nonNull(selectedItem)) {
+                    createIssueTypeComboBox();
+                    if (isNull(createIssue.getAssignableUserList())) {
+                        createAssignableUserComboBox();
+                    }
+                }
+                getContentPanel().setCursor(Cursor.getDefaultCursor());
+            });
+
+        });
+    }
+
+    private void createIssueTypeComboBox() {
+        JiraServerManager manager = project.getComponent(JiraServerManager.class);
+        JiraRestApi jiraRestApi = manager.getJiraRestApi();
+        JiraProject selectedProject = (JiraProject) this.projectComboBox.getSelectedItem();
+        if (nonNull(selectedProject)) {
+            List<JiraIssueType> issueTypeList = ((JiraProject) jiraRestApi.getProject(selectedProject.getKey()).get()).getIssueTypes();
+            issueTypeItems = new CollectionComboBoxModel(new ArrayList());
+            for (JiraIssueType issueType : issueTypeList) {
+                JiraIssueType clone = issueType.clone();
+                issueTypeItems.add(clone);
+            }
+
+            if (isNull(issueTypeComboBox)) {
+                issueTypeComboBox = new ComboBox<>(issueTypeItems);
+            } else {
+                issueTypeComboBox.setModel(issueTypeItems);
+            }
+            issueTypeComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
+            issueTypeComboBox.setSelectedIndex(0);
+            issueTypeComboBox.updateUI();
+        }
+    }
+
+    private void createAssignableUserComboBox() {
+        if (isNull(createIssue.getAssignableUserList())) {
+            JiraServerManager manager = project.getComponent(JiraServerManager.class);
+            JiraRestApi jiraRestApi = manager.getJiraRestApi();
+            JiraProject selectedProject = (JiraProject) this.projectComboBox.getSelectedItem();
+            if (nonNull(selectedProject)) {
+                List<JiraIssueUser> assignableUserList = jiraRestApi.getAssignableUsers("project", selectedProject.getKey());
+                assignableUsersItems = new CollectionComboBoxModel(new ArrayList());
+                for (JiraIssueUser user : assignableUserList) {
+                    JiraIssueUser clone = user.clone();
+                    assignableUsersItems.add(clone);
+                }
+            }
+        } else {
+            assignableUsersItems = new CollectionComboBoxModel(new ArrayList());
+            for (JiraIssueUser jiraIssueUser : createIssue.getAssignableUserList()) {
+                JiraIssueUser clone = jiraIssueUser.clone();
+                assignableUsersItems.add(clone);
+            }
+        }
+
+        if (isNull(reporterComboBox)) {
+            reporterComboBox = new ComboBox<>(assignableUsersItems);
+        } else {
+            reporterComboBox.setModel(assignableUsersItems);
+        }
+        reporterComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
+        reporterComboBox.setSelectedItem(createIssue.getMyInfo());
+        reporterComboBox.updateUI();
+
+        if (isNull(assigneeComboBox)) {
+            assigneeComboBox = new ComboBox<>(assignableUsersItems);
+        } else {
+            assigneeComboBox.setModel(assignableUsersItems);
+        }
+        assigneeComboBox.setPreferredSize(UI.size(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
+        assigneeComboBox.setSelectedItem(createIssue.getMyInfo());
+        assigneeComboBox.updateUI();
+    }
 
     @Nullable
     @Override
@@ -180,16 +248,21 @@ public class IssueCreateDialog extends DialogWrapper {
     protected void doOKAction() {
         if (nonNull(project)) {
             createIssue = new JiraIssueForCreate();
+            JiraProject selectedProject = (JiraProject) projectComboBox.getSelectedItem();
+            createIssue.setProjectId(selectedProject.getId());
+
             createIssue.setSummary(summaryTextField.getText());
+
+            JiraIssueType selectedIssueType = (JiraIssueType) issueTypeComboBox.getSelectedItem();
+            createIssue.setIssueTypeId(selectedIssueType.getId());
+
             JiraIssueUser selectedReporter = (JiraIssueUser) reporterComboBox.getSelectedItem();
             createIssue.setReporter(selectedReporter.getName());
+
             JiraIssueUser selectedAssignee = (JiraIssueUser) assigneeComboBox.getSelectedItem();
             createIssue.setAssignee(selectedAssignee.getName());
+
             createIssue.setDescription(descriptionTextArea.getText());
-            createIssue.setProjectId(fields.getProject().getId());
-            JiraIssueType selectedIssueType = (JiraIssueType) issueTypeComboBox.getSelectedItem();
-            createIssue.setIssueTypeId(selectedIssueType.getId()); //작업 - 해야할일
-            createIssue.setParentIssueIdOrKey(parentIssueIdOrKey);
 
             new CreateIssueTask(project, createIssue).queue();
         }

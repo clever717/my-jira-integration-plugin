@@ -76,6 +76,9 @@ public class JiraIssueParser {
         return wrapper.getGroups();
     }
 
+    public static List<JiraProject> parseProjects(String response) {
+        return Arrays.asList(JiraRepository.GSON.fromJson(response, JiraProject[].class));
+    }
     public static JiraProject parseProject(String response) {
         return JiraRepository.GSON.fromJson(response, JiraProject.class);
     }

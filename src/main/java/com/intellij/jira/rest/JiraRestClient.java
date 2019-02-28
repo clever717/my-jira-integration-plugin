@@ -72,18 +72,27 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-    public List<JiraIssueUser> getAssignableUsers(String issueKey) throws Exception {
+    public List<JiraIssueUser> getAssignableUsers(String type, String key) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("user", "assignable", SEARCH));
 
         List<JiraIssueUser> newUsers;
         List<JiraIssueUser> jiraUsers = new ArrayList<>();
 
         do {
-            method.setQueryString(new NameValuePair[]{
-                    new NameValuePair("issueKey", issueKey),
-                    new NameValuePair("startAt", String.valueOf(jiraUsers.size())),
-                    new NameValuePair("maxResults", String.valueOf(MAX_USERS_RESULTS)),
-            });
+            if ("project".equals(type)) {
+                method.setQueryString(new NameValuePair[]{
+                        new NameValuePair("project", key),
+                        new NameValuePair("startAt", String.valueOf(jiraUsers.size())),
+                        new NameValuePair("maxResults", String.valueOf(MAX_USERS_RESULTS))
+                });
+            } else {
+                method.setQueryString(new NameValuePair[]{
+                        new NameValuePair("issueKey", key),
+                        new NameValuePair("startAt", String.valueOf(jiraUsers.size())),
+                        new NameValuePair("maxResults", String.valueOf(MAX_USERS_RESULTS))
+                });
+            }
+
 
             String response = jiraRepository.executeMethod(method);
             newUsers = parseUsers(response);
@@ -216,6 +225,12 @@ public class JiraRestClient {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("myself"));
         jiraRepository.executeMethod(method);
         return method.getStatusCode() == 200;
+    }
+
+    public List<JiraProject> findProjects() throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("project"));
+        String response = jiraRepository.executeMethod(method);
+        return parseProjects(response);
     }
 
     public JiraProject getProject(String projectKey) throws Exception {

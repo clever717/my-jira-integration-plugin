@@ -26,8 +26,11 @@ public class CreateIssueTask extends AbstractBackgroundableTask {
             throw new InvalidResultException("Create error", "Issue has not been created");
         }
 
-        JiraIssue createdIssue = (JiraIssue) result.get();
-        Result linked = jiraRestApi.linkIssue(createdIssue.getKey(), issue.getParentIssueIdOrKey());
+        //부모 이슈에서 만들때만 링크 자동 연결
+        if (issue.getParentIssueIdOrKey() != null) {
+            JiraIssue createdIssue = (JiraIssue) result.get();
+            Result linked = jiraRestApi.linkIssue(createdIssue.getKey(), issue.getParentIssueIdOrKey());
+        }
     }
 
 

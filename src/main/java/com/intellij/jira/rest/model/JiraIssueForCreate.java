@@ -1,5 +1,7 @@
 package com.intellij.jira.rest.model;
 
+import java.util.List;
+
 public class JiraIssueForCreate {
 
     private String summary;
@@ -9,6 +11,10 @@ public class JiraIssueForCreate {
     private String projectId;
     private String issueTypeId;
     private String parentIssueIdOrKey;
+
+    private JiraIssueUser myInfo;
+    private List<JiraProject> projectList;
+    private List<JiraIssueUser> assignableUserList;
 
     public String getSummary() {
         return summary;
@@ -64,5 +70,29 @@ public class JiraIssueForCreate {
 
     public void setParentIssueIdOrKey(String parentIssueIdOrKey) {
         this.parentIssueIdOrKey = parentIssueIdOrKey;
+    }
+
+    public List<JiraProject> getProjectList() {
+        return projectList;
+    }
+
+    public void setProjectList(List<JiraProject> projectList) {
+        this.projectList = projectList;
+    }
+
+    public List<JiraIssueUser> getAssignableUserList() {
+        return assignableUserList;
+    }
+
+    public void setAssignableUserList(List<JiraIssueUser> assignableUserList) {
+        this.assignableUserList = assignableUserList;
+    }
+
+    public JiraIssueUser getMyInfo() {
+        return myInfo;
+    }
+
+    public void setMyInfo(JiraIssueUser myInfo) {
+        this.myInfo = myInfo;
     }
 }

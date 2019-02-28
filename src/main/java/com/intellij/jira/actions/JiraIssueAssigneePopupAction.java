@@ -2,8 +2,8 @@ package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.jira.rest.model.JiraIssueUser;
-import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.popup.JiraIssueAssignableUsersPopup;
 import com.intellij.jira.util.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -31,7 +31,7 @@ public class JiraIssueAssigneePopupAction extends JiraIssueAction {
             JiraServerManager jiraServerManager = project.getComponent(JiraServerManager.class);
             JiraRestApi jiraServer = jiraServerManager.getJiraRestApi();
             if(nonNull(jiraServer)){
-                List<JiraIssueUser> assignableUsers = jiraServer.getAssignableUsers(issueFactory.create().getKey());
+                List<JiraIssueUser> assignableUsers = jiraServer.getAssignableUsers("issue", issueFactory.create().getKey());
                 JiraIssueAssignableUsersPopup popup = new JiraIssueAssignableUsersPopup(createActionGroup(assignableUsers), project);
                 popup.showInCenterOf(getComponent());
             }
