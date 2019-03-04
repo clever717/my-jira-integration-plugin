@@ -250,24 +250,25 @@ public class IssueCreateDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         if (nonNull(project)) {
-            createIssue = new JiraIssueForCreate();
+            JiraIssueForCreate issue = new JiraIssueForCreate();
             JiraProject selectedProject = (JiraProject) projectComboBox.getSelectedItem();
-            createIssue.setProjectId(selectedProject.getId());
+            issue.setProjectId(selectedProject.getId());
 
-            createIssue.setSummary(summaryTextField.getText());
+            issue.setSummary(summaryTextField.getText());
 
             JiraIssueType selectedIssueType = (JiraIssueType) issueTypeComboBox.getSelectedItem();
-            createIssue.setIssueTypeId(selectedIssueType.getId());
+            issue.setIssueTypeId(selectedIssueType.getId());
 
             JiraIssueUser selectedReporter = (JiraIssueUser) reporterComboBox.getSelectedItem();
-            createIssue.setReporter(selectedReporter.getName());
+            issue.setReporter(selectedReporter.getName());
 
             JiraIssueUser selectedAssignee = (JiraIssueUser) assigneeComboBox.getSelectedItem();
-            createIssue.setAssignee(selectedAssignee.getName());
+            issue.setAssignee(selectedAssignee.getName());
 
-            createIssue.setDescription(descriptionTextArea.getText());
+            issue.setDescription(descriptionTextArea.getText());
+            issue.setParentIssueIdOrKey(createIssue.getParentIssueIdOrKey());
 
-            new CreateIssueTask(project, createIssue).queue();
+            new CreateIssueTask(project, issue).queue();
 
         }
 
