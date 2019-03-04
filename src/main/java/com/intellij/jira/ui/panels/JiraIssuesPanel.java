@@ -16,6 +16,8 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
@@ -24,7 +26,12 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +77,39 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
             issueTable.getSelectionModel().addListSelectionListener(event -> {
                 SwingUtilities.invokeLater(() -> this.issueDetailsPanel.showIssue(issueTable.getSelectedObject()));
             });
+            final JBPopupMenu popupMenu = new JBPopupMenu();
+            JBMenuItem copyMenu = new JBMenuItem(new DefaultEditorKit.CopyAction());
+            copyMenu.addActionListener(e -> {
+                JiraIssue issue = issueTable.getSelectedObject();
+                if (nonNull(issue)) {
+                    StringSelection selection = new StringSelection(issue.getKey() + " : " + issue.getSummary());
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(selection, selection);
+                }
+            });
+            popupMenu.add(copyMenu);
+            popupMenu.addPopupMenuListener(new PopupMenuListener() {
+                @Override
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                    SwingUtilities.invokeLater(() -> {
+                        int rowAtPoint = issueTable.rowAtPoint(SwingUtilities.convertPoint(popupMenu, new Point(0, 0), issueTable));
+                        if (rowAtPoint > -1) {
+                            issueTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                        }
+                    });
+                }
 
+                @Override
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+
+                }
+
+                @Override
+                public void popupMenuCanceled(PopupMenuEvent e) {
+
+                }
+            });
+            issueTable.setComponentPopupMenu(popupMenu);
 
             JPanel issuesPanel = new JPanel(new BorderLayout());
             issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));

@@ -265,6 +265,7 @@ public class IssueCreateDialog extends DialogWrapper {
             createIssue.setDescription(descriptionTextArea.getText());
 
             new CreateIssueTask(project, createIssue).queue();
+
         }
 
         close(0);

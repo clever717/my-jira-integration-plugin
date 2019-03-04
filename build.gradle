@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '1.1'
+version '1.2'
 
 sourceCompatibility = 1.8
 
@@ -27,8 +27,8 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      Version 1.1<br>
+      Version 1.2<br>
       <ul>
-        <li>Bug fix</li>
+        <li>issue table copy-to-clipboard : {key} : {summary} </li>
       </ul>"""
 }
