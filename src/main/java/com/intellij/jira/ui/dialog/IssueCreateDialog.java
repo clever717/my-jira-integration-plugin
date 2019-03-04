@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -19,7 +20,6 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.UI;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,7 +100,7 @@ public class IssueCreateDialog extends DialogWrapper {
         String subSummary = "";
         String replaceStrDepartment = "[개발]";
         if (nonNull(createIssue.getMyInfo())) {
-            if (StringUtils.defaultIfEmpty(createIssue.getMyInfo().getName(), "").contains("Steve") || StringUtils.defaultIfEmpty(createIssue.getMyInfo().getEmailAddress(), "").contains("steve@allwin.bid")) {
+            if (StringUtil.defaultIfEmpty(createIssue.getMyInfo().getName(), "").contains("Steve") || StringUtil.defaultIfEmpty(createIssue.getMyInfo().getEmailAddress(), "").contains("steve@allwin.bid")) {
                 replaceStrDepartment = "[퍼블리싱]";
             }
         }
