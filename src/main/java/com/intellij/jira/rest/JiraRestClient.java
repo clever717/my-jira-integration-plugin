@@ -261,7 +261,7 @@ public class JiraRestClient {
     }
 
     public JiraIssue createIssue(JiraIssueForCreate issue) throws Exception {
-        String requestBody = "{\"fields\":{\"project\":{\"id\":\"" + issue.getProjectId() + "\"},\"summary\":\"" + issue.getSummary() + "\",\"issuetype\":{\"id\":\"" + issue.getIssueTypeId() + "\"},\"assignee\":{\"name\":\"" + issue.getAssignee() + "\"},\"reporter\":{\"name\":\"" + issue.getReporter() + "\"},\"description\":\"" + issue.getDescription() + "\"}}";
+        String requestBody = "{\"fields\":{\"project\":{\"id\":\"" + issue.getProjectId() + "\"},\"summary\":\"" + issue.getSummary() + "\",\"issuetype\":{\"id\":\"" + issue.getIssueTypeId() + "\"},\"assignee\":{\"name\":\"" + issue.getAssignee() + "\"},\"reporter\":{\"name\":\"" + issue.getReporter() + "\"},\"description\":\"" + issue.getDescription().replace("\r", "").replace("\n", "\\r\\n") + "\"}}";
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE));
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
