@@ -41,6 +41,7 @@ public class AddJiraVersionDialogAction extends JiraIssueAction {
             List<JiraProject> projectList = jiraRestApi.getProjects();
             AddVersionDialog dialog = new AddVersionDialog(project, projectList);
             dialog.show();
+            getComponent().setCursor(Cursor.getDefaultCursor());
         });
 
 

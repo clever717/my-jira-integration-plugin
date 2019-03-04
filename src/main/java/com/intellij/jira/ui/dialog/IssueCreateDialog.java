@@ -98,7 +98,7 @@ public class IssueCreateDialog extends DialogWrapper {
         Matcher matcher = summaryPattern.matcher(createIssue.getSummary());
         String subSummary = "";
         String replaceStrDepartment = "[개발]";
-        if (createIssue.getMyInfo().getName().indexOf("steve") > 0) {
+        if (createIssue.getMyInfo().getName().contains("Steve") || createIssue.getMyInfo().getEmailAdress().contains("steve@allwin.bid")) {
             replaceStrDepartment = "[퍼블리싱]";
         }
         if (matcher.find()) {
