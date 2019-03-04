@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '1.2'
+version '1.3'
 
 sourceCompatibility = 1.8
 
@@ -27,8 +27,28 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
+      Version 1.0<br>
+      <ul>
+        <li>Support 2018.3+</li>
+        <li>Finally Lunched my-jira-integration-plugin!!!</li>
+        <li>create new SubIssue</li>
+        <li>updatable version to issue</li>
+      </ul>
+      <br>
+      Version 1.1<br>
+      <ul>
+        <li>create new Issue</li>
+        <li>create new Version</li>
+        <li>Bug fix</li>
+      </ul>
+      <br>
       Version 1.2<br>
       <ul>
         <li>issue table copy-to-clipboard : {key} : {summary} </li>
+      </ul>
+      <br>
+      Version 1.3<br>
+      <ul>
+        <li>Bug fix</li>
       </ul>"""
 }
