@@ -9,23 +9,23 @@ public class JiraIssueUser {
     private String self;
     private String name;
     private String key;
-    private String emailAdress;
+    private String emailAddress;
     private String displayName;
     private JiraIssueUser.Avatar avatarUrls;
 
     public JiraIssueUser() { }
 
-    public JiraIssueUser(String self, String name, String key, String emailAdress, String displayName, JiraIssueUser.Avatar avatarUrls) {
+    public JiraIssueUser(String self, String name, String key, String emailAddress, String displayName, JiraIssueUser.Avatar avatarUrls) {
         this.self = self;
         this.name = name;
         this.key = key;
-        this.emailAdress = emailAdress;
+        this.emailAddress = emailAddress;
         this.displayName = displayName;
         this.avatarUrls = avatarUrls;
     }
 
     public JiraIssueUser(JiraIssueUser other) {
-        this(other.getSelf(), other.getName(), other.getKey(), other.getEmailAdress(), other.getDisplayName(), other.getAvatarUrls());
+        this(other.getSelf(), other.getName(), other.getKey(), other.getEmailAddress(), other.getDisplayName(), other.getAvatarUrls());
     }
 
     public String getSelf() {
@@ -40,8 +40,8 @@ public class JiraIssueUser {
         return key;
     }
 
-    public String getEmailAdress() {
-        return emailAdress;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
     public String getDisplayName() {

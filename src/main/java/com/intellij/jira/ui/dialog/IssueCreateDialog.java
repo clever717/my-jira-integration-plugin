@@ -19,6 +19,7 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.UI;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,8 +99,10 @@ public class IssueCreateDialog extends DialogWrapper {
         Matcher matcher = summaryPattern.matcher(createIssue.getSummary());
         String subSummary = "";
         String replaceStrDepartment = "[개발]";
-        if (createIssue.getMyInfo().getName().contains("Steve") || createIssue.getMyInfo().getEmailAdress().contains("steve@allwin.bid")) {
-            replaceStrDepartment = "[퍼블리싱]";
+        if (nonNull(createIssue.getMyInfo())) {
+            if (StringUtils.defaultIfEmpty(createIssue.getMyInfo().getName(), "").contains("Steve") || StringUtils.defaultIfEmpty(createIssue.getMyInfo().getEmailAddress(), "").contains("steve@allwin.bid")) {
+                replaceStrDepartment = "[퍼블리싱]";
+            }
         }
         if (matcher.find()) {
             subSummary = matcher.replaceFirst(replaceStrDepartment);
