@@ -23,6 +23,7 @@ import com.intellij.jira.actions.JiraIssueTransitionDialogAction;
 import com.intellij.jira.actions.JiraIssueVersionPopupAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueAttachment;
+import com.intellij.jira.rest.model.JiraIssueLink;
 import com.intellij.jira.rest.model.JiraProjectVersionDetails;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
@@ -38,7 +39,11 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.Box;
@@ -46,15 +51,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import org.jetbrains.annotations.NotNull;
 
 class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
 
     private JiraIssue issue;
+  private JiraIssuesPanel issuesPanel;
 
-    JiraIssuePreviewPanel(@NotNull JiraIssue issue) {
+  JiraIssuePreviewPanel(@NotNull JiraIssue issue, JiraIssuesPanel issuesPanel) {
         super(true, true);
         this.issue = issue;
+    this.issuesPanel = issuesPanel;
         setBackground(JBColor.white);
         initToolbar();
         initContent();
@@ -162,6 +170,69 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         issueAttachmentPanel.add(attachmentLabel, PAGE_START);
         issueAttachmentPanel.add(attachmentArea, CENTER);
 
+      // link
+      JBPanel issueLinkPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+      JBLabel linkLabel = JiraLabelUtil.createLabel("Issue link: ").withFont(BOLD).withBorder(MARGIN_BOTTOM);
+
+      JBPanel linkArea = JiraPanelUtil.createWhitePanel(new GridLayout(2, 1, -1, -1)).withBorder(MARGIN_BOTTOM);
+      boolean hasInward = false;
+      boolean hasOutward = false;
+      JBPanel inwardLinkArea = JiraPanelUtil.createWhitePanel(new GridLayout(0, 1, -1, -1));
+      JBPanel outwardLinkArea = JiraPanelUtil.createWhitePanel(new GridLayout(0, 1, -1, -1));
+      for (JiraIssueLink issueLink : issue.getIssueLinks()) {
+        if (issueLink.getInwardIssue() != null) {
+          if (!hasInward) {
+            JBLabel inwardLabel = new JBLabel(issueLink.getType().getInward());
+            inwardLinkArea.add(inwardLabel);
+            hasInward = true;
+          }
+          JBPanel row = new JBPanel(new FlowLayout(FlowLayout.LEFT)).withBackground(JBColor.WHITE);
+          JBLabel inwardLink = new JBLabel(issueLink.getInwardIssue().getKey());
+          inwardLink.setForeground(JBColor.BLUE);
+          inwardLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+          inwardLink.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              SwingUtilities.invokeLater(() -> issuesPanel.goToIssue(issueLink.getInwardIssue().getKey()));
+            }
+          });
+          row.add(inwardLink);
+          row.add(JiraLabelUtil.createLabel(issueLink.getInwardIssue().getSummary()));
+          inwardLinkArea.add(row);
+        }
+
+        if (issueLink.getOutwardIssue() != null) {
+          if (!hasOutward) {
+            JBLabel outwardLabel = new JBLabel(issueLink.getType().getOutward());
+            outwardLinkArea.add(outwardLabel);
+            hasOutward = true;
+          }
+          JBPanel row = new JBPanel(new FlowLayout(FlowLayout.LEFT)).withBackground(JBColor.WHITE);
+          JBLabel outwardLink = new JBLabel(issueLink.getOutwardIssue().getKey());
+          outwardLink.setForeground(JBColor.BLUE);
+          outwardLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+          outwardLink.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              SwingUtilities.invokeLater(() -> issuesPanel.goToIssue(issueLink.getOutwardIssue().getKey()));
+            }
+          });
+
+          row.add(outwardLink);
+          row.add(JiraLabelUtil.createLabel(issueLink.getOutwardIssue().getSummary()));
+          outwardLinkArea.add(row);
+        }
+      }
+
+      if (hasInward) {
+        linkArea.add(inwardLinkArea);
+      }
+      if (hasOutward) {
+        linkArea.add(outwardLinkArea);
+      }
+      issueLinkPanel.add(linkLabel, PAGE_START);
+      issueLinkPanel.add(linkArea, CENTER);
+
         // Description
         JBPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel descriptionLabel = JiraLabelUtil.createLabel("Description: ").withFont(BOLD).withBorder(MARGIN_BOTTOM);
@@ -178,6 +249,7 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         issueDetails.add(priorityAndAssigneePanel);
         issueDetails.add(versionsPanel);
         issueDetails.add(issueAttachmentPanel);
+      issueDetails.add(issueLinkPanel);
         issueDetails.add(issueDescriptionPanel);
 
         previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);

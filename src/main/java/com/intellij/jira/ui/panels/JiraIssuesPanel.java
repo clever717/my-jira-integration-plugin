@@ -1,7 +1,16 @@
 package com.intellij.jira.ui.panels;
 
+import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import com.google.common.util.concurrent.SettableFuture;
-import com.intellij.jira.actions.*;
+import com.intellij.jira.actions.AddJiraIssueDialogAction;
+import com.intellij.jira.actions.AddJiraVersionDialogAction;
+import com.intellij.jira.actions.ConfigureJiraServersAction;
+import com.intellij.jira.actions.GoToIssuePopupAction;
+import com.intellij.jira.actions.JQLSearcherActionGroup;
+import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.components.JiraActionManager;
 import com.intellij.jira.components.JiraIssueUpdater;
@@ -24,22 +33,22 @@ import com.intellij.ui.JBSplitter;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-
-import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.text.DefaultEditorKit;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
-
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.text.DefaultEditorKit;
 
 public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueEventListener {
 
@@ -71,7 +80,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
             content = JiraPanelUtil.createPlaceHolderPanel("No Jira server found");
         }else{
             List<JiraIssue> issues = myJiraRestApi.getIssues(getDefaultJQLSearcher());
-            issueDetailsPanel = new JiraIssueDetailsPanel();
+            issueDetailsPanel = new JiraIssueDetailsPanel(this);
 
             issueTable = new JiraIssueTableView(issues);
             issueTable.getSelectionModel().addListSelectionListener(event -> {

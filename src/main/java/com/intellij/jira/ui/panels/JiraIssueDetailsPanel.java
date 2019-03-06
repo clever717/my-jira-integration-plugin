@@ -1,25 +1,26 @@
 package com.intellij.jira.ui.panels;
 
+import static java.util.Objects.isNull;
+
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.util.Objects.isNull;
+import javax.swing.JTabbedPane;
+import org.jetbrains.annotations.Nullable;
 
 public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
 
     private static final String TAB_KEY = "selectedTab";
     private final Map<String, Integer> data = new HashMap<>();
+  private JiraIssuesPanel issuesPanel;
 
-    public JiraIssueDetailsPanel(){
+  public JiraIssueDetailsPanel(JiraIssuesPanel issuesPanel) {
         super(true);
         setEmptyContent();
+    this.issuesPanel = issuesPanel;
     }
 
 
@@ -28,7 +29,7 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
             setEmptyContent();
         }else{
             JiraTabbedPane tabbedPane = new JiraTabbedPane(JTabbedPane.BOTTOM);
-            tabbedPane.addTab("Preview", new JiraIssuePreviewPanel(issue));
+          tabbedPane.addTab("Preview", new JiraIssuePreviewPanel(issue, issuesPanel));
             tabbedPane.addTab(String.format("Comments (%d)", issue.getComments().getTotal()), new JiraIssueCommentsPanel(issue));
             tabbedPane.addTab(String.format("Links (%d)", issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue.getIssueLinks()));
 
