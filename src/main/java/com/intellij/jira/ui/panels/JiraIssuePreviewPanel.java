@@ -174,7 +174,7 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
       JBPanel issueLinkPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
       JBLabel linkLabel = JiraLabelUtil.createLabel("Issue link: ").withFont(BOLD).withBorder(MARGIN_BOTTOM);
 
-      JBPanel linkArea = JiraPanelUtil.createWhitePanel(new GridLayout(2, 1, -1, -1)).withBorder(MARGIN_BOTTOM);
+      JBPanel linkArea = JiraPanelUtil.createWhitePanel(new GridLayout(0, 1, -1, -1)).withBorder(MARGIN_BOTTOM);
       boolean hasInward = false;
       boolean hasOutward = false;
       JBPanel inwardLinkArea = JiraPanelUtil.createWhitePanel(new GridLayout(0, 1, -1, -1));
