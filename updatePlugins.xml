@@ -1,0 +1,12 @@
+<!DOCTYPE plugins [
+  <!ELEMENT plugins (plugin)*>
+  <!ELEMENT plugin (#PCDATA)>
+  <!ATTLIST plugin
+    id CDATA #REQUIRED
+    url CDATA #REQUIRED
+    version CDATA #IMPLIED>
+  ]>
+<plugins>
+  <plugin id="MyJiraIntegrationPlugin" url="http://repo.allwin.io/nexus/content/repositories/common
+/com/intellij/my-jira-integration-plugin/my-jira-integration-plugin/1.0/my-jira-integration-plugin-1.0.jar" version="1.0"/>
+</plugins>
