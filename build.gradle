@@ -55,5 +55,10 @@ patchPluginXml {
       Version 1.4<br>
       <ul>
         <li>Bug fix</li>
+      </ul>
+      <br>
+      Version 1.5<br>
+      <ul>
+        <li>open Attachment</li>
       </ul>"""
 }

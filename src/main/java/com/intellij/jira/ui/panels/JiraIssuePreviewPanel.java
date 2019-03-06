@@ -1,7 +1,28 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.actions.*;
+import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
+import static com.intellij.jira.util.JiraLabelUtil.BOLD;
+import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
+import static com.intellij.jira.util.JiraLabelUtil.createEmptyLabel;
+import static com.intellij.jira.util.JiraLabelUtil.createIconLabel;
+import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
+import static java.awt.BorderLayout.CENTER;
+import static java.awt.BorderLayout.LINE_START;
+import static java.awt.BorderLayout.PAGE_START;
+import static java.util.Objects.nonNull;
+import static javax.swing.BoxLayout.X_AXIS;
+import static javax.swing.BoxLayout.Y_AXIS;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+
+import com.intellij.jira.actions.AddJiraSubIssueDialogAction;
+import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
+import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
+import com.intellij.jira.actions.JiraIssueTransitionDialogAction;
+import com.intellij.jira.actions.JiraIssueVersionPopupAction;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueAttachment;
 import com.intellij.jira.rest.model.JiraProjectVersionDetails;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
@@ -16,22 +37,16 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
-import static com.intellij.jira.util.JiraLabelUtil.*;
-import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
-import static java.awt.BorderLayout.*;
-import static java.util.Objects.nonNull;
-import static javax.swing.BoxLayout.X_AXIS;
-import static javax.swing.BoxLayout.Y_AXIS;
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
-import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import org.jetbrains.annotations.NotNull;
 
 class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
 
@@ -134,6 +149,18 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         versionsPanel.add(versionsLabel, LINE_START);
         versionsPanel.add(versionsValueLabel, CENTER);
 
+        // Attachment
+        JBPanel issueAttachmentPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+        JBLabel attachmentLabel = JiraLabelUtil.createLabel("Attachment: ").withFont(BOLD).withBorder(MARGIN_BOTTOM);
+
+        JBPanel attachmentArea = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+        for (JiraIssueAttachment attachment : issue.getAttatchment()) {
+            JBLabel fileLink = JiraLabelUtil.createLinkLabel(attachment.getFilename(), attachment.getContent());
+            attachmentArea.add(fileLink);
+        }
+
+        issueAttachmentPanel.add(attachmentLabel, PAGE_START);
+        issueAttachmentPanel.add(attachmentArea, CENTER);
 
         // Description
         JBPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
@@ -150,6 +177,7 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         issueDetails.add(typeAndStatusPanel);
         issueDetails.add(priorityAndAssigneePanel);
         issueDetails.add(versionsPanel);
+        issueDetails.add(issueAttachmentPanel);
         issueDetails.add(issueDescriptionPanel);
 
         previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
@@ -180,4 +208,11 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
                 .collect(Collectors.joining(", "));
     }
 
+    private void openWebPage(String url) {
+        try {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

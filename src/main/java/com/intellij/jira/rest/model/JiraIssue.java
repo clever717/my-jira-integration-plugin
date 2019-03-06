@@ -2,14 +2,13 @@ package com.intellij.jira.rest.model;
 
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
 import com.intellij.util.containers.ContainerUtil;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,fixVersions";
+  public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,fixVersions,attachment";
 
     private String id;
     private String self;
@@ -37,6 +36,10 @@ public class JiraIssue {
     public String getDescription() {
         return fields.description;
     }
+
+  public List<JiraIssueAttachment> getAttatchment() {
+    return fields.attachment;
+  }
 
     public Date getCreated() {
         return fields.created;
@@ -126,6 +129,7 @@ public class JiraIssue {
         private JiraProject project;
         private List<JiraProjectVersion> versions = ContainerUtil.emptyList();
         private List<JiraProjectVersionDetails> fixVersions = ContainerUtil.emptyList();
+      private List<JiraIssueAttachment> attachment = ContainerUtil.emptyList();
 
         public Fields() { }
 
@@ -264,6 +268,14 @@ public class JiraIssue {
         public void setFixVersions(List<JiraProjectVersionDetails> fixVersions) {
             this.fixVersions = fixVersions;
         }
+
+      public List<JiraIssueAttachment> getAttachment() {
+        return attachment;
+      }
+
+      public void setAttachment(List<JiraIssueAttachment> attachment) {
+        this.attachment = attachment;
+      }
     }
 
     public Fields getFields() {
