@@ -60,5 +60,6 @@ patchPluginXml {
       Version 1.5<br>
       <ul>
         <li>open Attachment</li>
+        <li>linked Issue</li>
       </ul>"""
 }
