@@ -1,5 +1,8 @@
 package com.intellij.jira.actions;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import com.intellij.icons.AllIcons;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraProjectVersionDetails;
@@ -10,11 +13,8 @@ import com.intellij.jira.util.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-
 import java.util.List;
-
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import java.util.stream.Collectors;
 
 public class JiraIssueVersionPopupAction extends JiraIssueAction {
     private static final ActionProperties properties = ActionProperties.of("Version", AllIcons.Vcs.History);
@@ -40,7 +40,7 @@ public class JiraIssueVersionPopupAction extends JiraIssueAction {
 
         JiraIssue issue = this.issueFactory.create();
         List<JiraProjectVersionDetails> versions = jiraRestApi.getProjectVersionDetails(issue.getProject().getKey());
-
+      versions = versions.stream().filter(v -> !v.isReleased()).collect(Collectors.toList());
         JiraIssueVersionPopup popup = new JiraIssueVersionPopup(createActionGroup(versions, issue), project);
         popup.showInCenterOf(getComponent());
 
