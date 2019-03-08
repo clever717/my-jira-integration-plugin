@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '1.5'
+version '1.6'
 
 sourceCompatibility = 1.8
 
@@ -61,5 +61,10 @@ patchPluginXml {
       <ul>
         <li>open Attachment</li>
         <li>linked Issue</li>
+      </ul>
+      <br>
+      Version 1.6<br>
+      <ul>
+        <li>get unreleased versions</li>
       </ul>"""
 }
