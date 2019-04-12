@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '1.6'
+version '1.7'
 
 sourceCompatibility = 1.8
 
@@ -22,7 +22,7 @@ dependencies {
 }
 
 intellij {
-    version '2018.3'
+    version '2019.1'
     plugins 'tasks'
 }
 patchPluginXml {
@@ -66,5 +66,10 @@ patchPluginXml {
       Version 1.6<br>
       <ul>
         <li>get unreleased versions</li>
+      </ul>
+      <br>
+      Version 1.7<br>
+      <ul>
+        <li>intellij 2019.1 Update</li>
       </ul>"""
 }

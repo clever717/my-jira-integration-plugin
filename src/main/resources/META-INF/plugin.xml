@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.intellij.jira</id>
+    <id>com.intellij.myjira</id>
     <name>My Jira Integration by hans</name>
     <vendor email="clever717@gmail.com" url="https://github.com/clever717/my-jira-integration-plugin">Hans Lee</vendor>
 
@@ -26,36 +26,36 @@
 
     <application-components>
         <component>
-            <implementation-class>com.intellij.jira.components.JiraActionManager</implementation-class>
+            <implementation-class>com.intellij.myjira.components.JiraActionManager</implementation-class>
         </component>
         <component>
-            <implementation-class>com.intellij.jira.components.JiraNotificationManager</implementation-class>
+            <implementation-class>com.intellij.myjira.components.JiraNotificationManager</implementation-class>
         </component>
     </application-components>
 
     <project-components>
         <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherManager</implementation-class>
+            <implementation-class>com.intellij.myjira.components.JQLSearcherManager</implementation-class>
         </component>
         <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherObserver</implementation-class>
+            <implementation-class>com.intellij.myjira.components.JQLSearcherObserver</implementation-class>
         </component>
         <component>
-            <implementation-class>com.intellij.jira.server.JiraServerManager</implementation-class>
+            <implementation-class>com.intellij.myjira.server.JiraServerManager</implementation-class>
         </component>
         <component>
-            <implementation-class>com.intellij.jira.components.JiraIssueUpdater</implementation-class>
+            <implementation-class>com.intellij.myjira.components.JiraIssueUpdater</implementation-class>
         </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory"/>
+        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.myjira.ui.JiraToolWindowFactory"/>
 
     </extensions>
 
     <actions>
         <action id="Jira.toolwindow.Refresh"
-                class="com.intellij.jira.actions.JiraIssuesRefreshAction"
+          class="com.intellij.myjira.actions.JiraIssuesRefreshAction"
                 text="Refresh issues"
                 description="Updates the project issues"
                 icon="AllIcons.Actions.Refresh">
